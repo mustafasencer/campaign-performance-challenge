@@ -1,11 +1,9 @@
 import os
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 
-import psycopg2
 import numpy
-from psycopg2.extensions import register_adapter, AsIs
-
-from scenario_2.sql_queries import drop_table_queries, create_table_queries
+import psycopg2
+from psycopg2.extensions import AsIs, register_adapter
 
 
 def adapt_numpy_float64(numpy_float64):
@@ -37,7 +35,8 @@ def create_connection(database_name: str):
     :return:
     """
     conn = psycopg2.connect(
-        f"host={os.getenv('POSTGRES_HOST')} port={os.getenv('POSTGRES_PORT')} dbname={database_name} user={os.getenv('POSTGRES_USER')} password={os.getenv('POSTGRES_PASSWORD')}")
+        f"host={os.getenv('POSTGRES_HOST')} port={os.getenv('POSTGRES_PORT')} dbname={database_name} user={os.getenv('POSTGRES_USERNAME')} password={os.getenv('POSTGRES_PASSWORD')}"
+    )
     conn.set_session(autocommit=True)
     cur = conn.cursor()
     return conn, cur
@@ -53,9 +52,11 @@ def create_database(database_name: str):
     conn, cur = create_connection("postgres")
 
     try:
-        cur.execute(f"""SELECT pg_terminate_backend(pg_stat_activity.pid)
+        cur.execute(
+            f"""SELECT pg_terminate_backend(pg_stat_activity.pid)
                         FROM pg_stat_activity
-                        WHERE pg_stat_activity.datname = '{database_name}' AND pid <> pg_backend_pid();""")
+                        WHERE pg_stat_activity.datname = '{database_name}' AND pid <> pg_backend_pid();"""
+        )
         cur.execute("DROP DATABASE IF EXISTS sample")
         # create sample database with UTF8 encoding
         cur.execute("CREATE DATABASE sample WITH ENCODING 'utf8' TEMPLATE template0")
@@ -64,7 +65,7 @@ def create_database(database_name: str):
         conn.close()
 
     # connect to sample database
-    return create_connection("sample")
+    return create_connection(os.getenv("POSTGRES_DB"))
 
 
 def chunks(data, chunk_size):
@@ -75,7 +76,7 @@ def chunks(data, chunk_size):
     :return:
     """
     for i in range(0, len(data), chunk_size):
-        yield data[i:i + chunk_size]
+        yield data[i : i + chunk_size]
 
 
 def execute(cur, query: str, vars: Optional[Tuple] = None):
