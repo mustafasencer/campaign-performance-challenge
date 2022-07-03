@@ -28,7 +28,6 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
         if [ -f requirements-dev.txt ]; make dev-deps; fi
         if [ -f requirements.txt ]; make deps; fi
     - name: Lint
