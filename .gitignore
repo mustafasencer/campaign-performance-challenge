@@ -1,0 +1,14 @@
+.DS_Store
+.vscode
+*.pyc
+__pycache__
+env
+venv
+dist
+.mypy_cache
+.idea
+site
+.coverage
+htmlcov
+.pytest_cache
+coverage.xml
