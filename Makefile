@@ -1,7 +1,7 @@
-.PHONY: deps run-infra run-infra-background migrate-scenario-1 migrate-scenario-2 run-scenario-1 run-scenario-2 stop-infra down-infra test test-with-coverage help
+.PHONY: dev-deps deps format lint run-infra run-infra-background migrate-scenario-1 migrate-scenario-2 run-scenario-1 run-scenario-2 stop-infra down-infra test test-with-coverage help
 .DEFAULT_GOAL := help
 
-SERVICE=etl
+SERVICE=aklamio-challenge
 IMAGE?=$(SERVICE):latest
 
 ## dev-deps: Install python dev packages
@@ -11,6 +11,18 @@ dev-deps:
 ## deps: Install python packages
 deps:
 	pip install -r requirements.txt
+
+## format: Format codebase
+format:
+	autoflake --remove-all-unused-imports --recursive --remove-unused-variables --in-place scenario_1 scenario_2 tests utils --exclude=__init__.py
+	black scenario_1 scenario_2 tests utils main.py
+	isort scenario_1 scenario_2 tests utils main.py --profile black
+
+## lint: Lint codebase
+lint:
+	mypy scenario_1 scenario_2 tests utils
+	black scenario_1 scenario_2 tests utils main.py --check
+	isort scenario_1 scenario_2 tests utils main.py --check-only --profile black
 
 ## run-infra: Run the infrastructure services required for the service
 run-infra:
@@ -34,6 +46,7 @@ migrate-scenario-1:
 	POSTGRES_DB=sample \
 	POSTGRES_USERNAME=postgres \
 	POSTGRES_PASSWORD=postgres \
+	FILE_PATH=data/aklamio_challenge.json \
 	python main.py migrate 1
 
 ## migrate-scenario-2: Migrate the scenario #2 locally on the host machine
@@ -43,6 +56,7 @@ migrate-scenario-2:
 	POSTGRES_DB=sample \
 	POSTGRES_USERNAME=postgres \
 	POSTGRES_PASSWORD=postgres \
+	FILE_PATH=data/aklamio_challenge.json \
 	python main.py migrate 2
 
 ## run-scenario-1: Run the scenario #1 locally on the host machine
@@ -52,6 +66,7 @@ run-scenario-1:
 	POSTGRES_DB=sample \
 	POSTGRES_USERNAME=postgres \
 	POSTGRES_PASSWORD=postgres \
+	FILE_PATH=data/aklamio_challenge.json \
 	python main.py run 1
 
 ## run-scenario-2: Run the scenario #2 locally on the host machine
@@ -61,6 +76,7 @@ run-scenario-2:
 	POSTGRES_DB=sample \
 	POSTGRES_USERNAME=postgres \
 	POSTGRES_PASSWORD=postgres \
+	FILE_PATH=data/aklamio_challenge.json \
 	python main.py run 2
 
 ## test: Run the project unit tests
