@@ -1,26 +1,9 @@
 import json
+import os
 
-import pandas as pd
-import psycopg2
-import numpy
-from psycopg2.extensions import register_adapter, AsIs
-from .sql_queries import *
+import typer
 
-
-def adapt_numpy_float64(numpy_float64):
-    return AsIs(numpy_float64)
-
-
-def adapt_numpy_int64(numpy_int64):
-    return AsIs(numpy_int64)
-
-
-register_adapter(numpy.float64, adapt_numpy_float64)
-register_adapter(numpy.int64, adapt_numpy_int64)
-
-
-def batch_insert():
-    pass
+from utils.database import create_connection
 
 
 def gen(file_name):
@@ -29,20 +12,28 @@ def gen(file_name):
             yield json.loads(line)
 
 
-def process_file(cur, conn, filepath):
-    # read json data
-    pass
+def process_file(cur, progress, filepath):
+    """
+
+    :param cur:
+    :param progress:
+    :param filepath:
+    :return:
+    """
+    # read json data line by line
+    for row in gen(filepath):
+        print(row)
 
 
 def run():
     """
-    Driver function for loading songs and log data into Postgres database
+    Driver function for extracting, transforming and loading the campaign performance analysis
+    :return:
     """
-    conn = psycopg2.connect("host=127.0.0.1 dbname=sample user=postgres password=postgres")
-    conn.set_session(autocommit=True)
-    cur = conn.cursor()
+    conn, cur = create_connection(os.getenv("POSTGRES_DB"))
 
     try:
-        process_file(cur, conn, filepath="data/aklamio_challenge.json")
+        with typer.progressbar(length=100) as progress:
+            process_file(cur, progress, filepath="data/aklamio_challenge.json")
     finally:
         conn.close()
