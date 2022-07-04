@@ -28,8 +28,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        if [ -f requirements-dev.txt ]; make dev-deps; fi
-        if [ -f requirements.txt ]; make deps; fi
+        make dev-deps
+        make deps
     - name: Lint
       run: |
         make lint
