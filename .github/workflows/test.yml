@@ -33,6 +33,13 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+    env:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: sample
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: postgres
+      FILE_PATH: tests/test_data/aklamio_challenge_test.jso
 
     steps:
     - uses: actions/checkout@v3
