@@ -1,0 +1,16 @@
+{"event_id":"0a804e0d-0c03-4f96-8da5-c19826ab5a62","fired_at":"01\/01\/2022, 00:00:06","user_id":6213,"event_type":"ReferralPageLoad","ip":"172.27.25.178","email":"amy89@example.org"}
+{"event_id":"2982dfec-3408-40e9-bff7-1e5656515eab","fired_at":"01\/01\/2022, 00:00:08","user_id":8727,"event_type":"ReferralPageLoad","ip":"192.168.215.255","email":"cathyvasquez@example.com"}
+{"event_id":"373702f1-617b-4db3-a375-72302b14a264","fired_at":"01\/01\/2022, 00:00:13","user_id":3980,"event_type":"EMPTY_VALUE","ip":"172.26.117.132","email":"marysmith@example.net"}
+{"event_id":"f96f19da-f834-45d8-abf7-d4a3d8ae15c6","fired_at":"01\/01\/2022, 00:00:20","user_id":9548,"event_type":"ReferralPageLoad","ip":"192.168.96.46","email":"moralessara@example.org"}
+{"event_id":"e7db597b-9a9f-453b-9be0-55bcf2220809","fired_at":"01\/01\/2022, 00:00:43","user_id":6559,"event_type":"ReferralPageLoad","ip":"192.168.232.100","email":"robincollins@example.net"}
+{"event_id":"a5c98572-453d-4853-ab04-dd2fad01de84","fired_at":"01\/01\/2022, 00:00:55","user_id":1330,"event_type":"ReferralPageLoad","ip":"192.168.110.180","email":"deborah03@example.net"}
+{"event_id":"5dd31ded-4adf-4d7a-8c66-dc31deaf6bd0","fired_at":"01\/01\/2022, 00:00:56","user_id":8286,"event_type":"ReferralPageLoad","ip":"192.168.195.102","email":"kingjennifer@example.net"}
+{"event_id":"b69a2cdd-c30a-4930-b74a-586f323d2122","fired_at":"01\/01\/2022, 00:00:57","user_id":3310,"event_type":"EMPTY_VALUE","ip":"192.168.40.235","email":"wjensen@example.org"}
+{"event_id":"d4a1a3ec-5355-43dc-a748-bd706bba82e8","fired_at":"01\/01\/2022, 00:01:10","user_id":9548,"event_type":"ReferralPageLoad","ip":"192.168.96.46","email":"moralessara@example.org"}
+{"event_id":"7a81b04b-5f37-4583-ad5d-ea0151dc1eb1","fired_at":"01\/01\/2022, 00:01:17","user_id":1047,"event_type":"ReferralPageLoad","ip":"10.206.96.49","email":"lindadaniels@example.net"}
+{"event_id":"59429f69-e083-4818-8d7a-feb565e7a836","fired_at":"01\/01\/2022, 00:01:17","user_id":1137,"event_type":"ReferralRecommendClick","ip":"10.179.100.56","email":"martinezwesley@example.net"}
+{"event_id":"72b5adbd-185d-4534-8605-13b810390e59","fired_at":"01\/01\/2022, 00:01:17","user_id":8727,"event_type":"ReferralPageLoad","ip":"192.168.215.255","email":"cathyvasquez@example.com"}
+{"event_id":"f2d80e51-1d16-474c-89b4-0288406bd2c7","fired_at":"01\/01\/2022, 00:01:18","user_id":6559,"event_type":"ReferralPageLoad","ip":"192.168.232.100","email":"robincollins@example.net"}
+{"event_id":"08b69c22-ceb1-42d2-aedb-203fa234cbe3","fired_at":"01\/01\/2022, 00:01:26","user_id":7499,"event_type":"EMPTY_VALUE","ip":"172.17.253.222","email":"rebecca83@example.org"}
+{"event_id":"2157db48-24a8-47fd-8744-f9e573b127da","fired_at":"01\/01\/2022, 00:01:33","user_id":1147,"event_type":"ReferralPageLoad","ip":"10.243.127.47","email":"michelleriley@example.org"}
+{"event_id":"557327aa-5bf5-4809-b5b5-2be43a6c6fa4","fired_at":"01\/01\/2022, 00:01:43","user_id":8143,"event_type":"ReferralPageLoad","ip":"192.168.145.165","email":"adrianmartin@example.net"}
