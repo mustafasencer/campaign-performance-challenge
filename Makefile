@@ -14,15 +14,15 @@ deps:
 
 ## format: Format codebase
 format:
-	autoflake --remove-all-unused-imports --recursive --remove-unused-variables --in-place scenario_1 scenario_2 tests utils --exclude=__init__.py
-	black scenario_1 scenario_2 tests utils main.py
-	isort scenario_1 scenario_2 tests utils main.py --profile black
+	autoflake --remove-all-unused-imports --recursive --remove-unused-variables --in-place scenario_1st scenario_2nd tests utils --exclude=__init__.py
+	black scenario_1st scenario_2nd tests utils main.py
+	isort scenario_1st scenario_2nd tests utils main.py --profile black
 
 ## lint: Lint codebase
 lint:
-	mypy scenario_1 scenario_2 tests utils
-	black scenario_1 scenario_2 tests utils main.py --check
-	isort scenario_1 scenario_2 tests utils main.py --check-only --profile black
+	mypy scenario_1st scenario_2nd utils
+	black scenario_1st scenario_2nd tests utils main.py --check
+	isort scenario_1st scenario_2nd tests utils main.py --check-only --profile black
 
 ## run-infra: Run the infrastructure services required for the service
 run-infra:
@@ -47,7 +47,7 @@ migrate-scenario-1:
 	POSTGRES_USERNAME=postgres \
 	POSTGRES_PASSWORD=postgres \
 	FILE_PATH=data/aklamio_challenge.json \
-	python main.py migrate 1
+	python main.py migrate --scenario 1st
 
 ## migrate-scenario-2: Migrate the scenario #2 locally on the host machine
 migrate-scenario-2:
@@ -57,7 +57,7 @@ migrate-scenario-2:
 	POSTGRES_USERNAME=postgres \
 	POSTGRES_PASSWORD=postgres \
 	FILE_PATH=data/aklamio_challenge.json \
-	python main.py migrate 2
+	python main.py migrate --scenario 2nd
 
 ## run-scenario-1: Run the scenario #1 locally on the host machine
 run-scenario-1:
@@ -66,8 +66,8 @@ run-scenario-1:
 	POSTGRES_DB=sample \
 	POSTGRES_USERNAME=postgres \
 	POSTGRES_PASSWORD=postgres \
-	FILE_PATH=data/aklamio_challenge.json \
-	python main.py run 1
+	FILE_PATH=data/aklamio_challenge_test.json \
+	python main.py run --scenario 1st
 
 ## run-scenario-2: Run the scenario #2 locally on the host machine
 run-scenario-2:
@@ -77,7 +77,7 @@ run-scenario-2:
 	POSTGRES_USERNAME=postgres \
 	POSTGRES_PASSWORD=postgres \
 	FILE_PATH=data/aklamio_challenge.json \
-	python main.py run 2
+	python main.py run --scenario 2nd
 
 ## test: Run the project unit tests
 test:
