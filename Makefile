@@ -85,7 +85,7 @@ test:
 
 ## test-with-coverage: Run the unit tests and calculate the coverage
 test-with-coverage:
-	pytest --cov-report term-missing --cov=etl tests/
+	pytest --cov-report term-missing --cov=.
 
 ## :
 ## help: Print out available make targets.
