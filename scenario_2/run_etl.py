@@ -1,6 +1,7 @@
 import json
 import os
 from datetime import datetime
+from enum import Enum
 from typing import Any, Dict, Final, Iterator, Tuple
 
 import typer
@@ -14,6 +15,8 @@ from .migrate_db import (
     event_table_insert,
     fact_table_table_insert,
     fact_table_table_select,
+    unique_user_table_insert,
+    unique_user_table_select,
     user_table_insert,
 )
 
@@ -33,6 +36,31 @@ EVENT_COLUMNS: Final[Tuple[str, ...]] = (
     "ip",
     "email",
 )
+
+
+class EventType(str, Enum):
+    CLICK = "ReferralRecommendClick"
+    PAGE_LOAD = "ReferralPageLoad"
+
+
+def get_unique_user_clicks(
+    cur: cursor, date_hour: datetime, row: Dict[str, Any]
+) -> int:
+    if row["event_type"] == EventType.CLICK.value:
+        execute(
+            cur,
+            unique_user_table_insert,
+            [date_hour, row["customer_id"], row["user_id"]],
+        )
+    execute(cur, unique_user_table_select, [date_hour, row["customer_id"]])
+    result = cur.fetchone()
+    return result["count"]
+
+
+def get_click_through_rate(
+    cur: cursor, date_hour: datetime, row: Dict[str, Any]
+) -> int:
+    return 0
 
 
 def process_file(cur: cursor, progress: "ProgressBar[int]") -> None:
@@ -82,27 +110,29 @@ def process_file(cur: cursor, progress: "ProgressBar[int]") -> None:
             fact_table_row = {
                 "date_hour": date_hour,
                 "customer_id": row["customer_id"],
-                "page_loads": 1 if row["event_type"] == "ReferralPageLoad" else 0,
-                "clicks": 1 if row["event_type"] == "ReferralRecommendClick" else 0,
-                "unique_user_clicks": None,
-                "click_through_rate": None,
+                "page_loads": 1
+                if row["event_type"] == EventType.PAGE_LOAD.value
+                else 0,
+                "clicks": 1 if row["event_type"] == EventType.CLICK.value else 0,
+                "unique_user_clicks": get_unique_user_clicks(cur, date_hour, row),
+                "click_through_rate": get_click_through_rate(cur, date_hour, row),
             }
         else:
             fact_table_row["page_loads"] = (
                 fact_table_row["page_loads"] + 1
-                if row["event_type"] == "ReferralPageLoad"
+                if row["event_type"] == EventType.PAGE_LOAD.value
                 else fact_table_row["page_loads"]
             )
             fact_table_row["clicks"] = (
                 fact_table_row["clicks"] + 1
-                if row["event_type"] == "ReferralRecommendClick"
-                else 0
+                if row["event_type"] == EventType.CLICK.value
+                else fact_table_row["clicks"]
             )
-            fact_table_row["unique_user_clicks"] = None
-            fact_table_row["click_through_rate"] = None
+            fact_table_row["unique_user_clicks"] = get_unique_user_clicks(
+                cur, date_hour, row
+            )
+            fact_table_row["click_through_rate"] = get_click_through_rate(
+                cur, date_hour, row
+            )
 
         execute(cur, fact_table_table_insert, list(fact_table_row.values()))
-
-        print(row)
-        print(row)
-        print(row)

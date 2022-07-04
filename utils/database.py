@@ -6,6 +6,7 @@ import numpy as np
 import psycopg2
 from psycopg2._psycopg import connection, cursor
 from psycopg2.extensions import AsIs, register_adapter
+from psycopg2.extras import RealDictCursor
 
 
 def adapt_numpy_float64(numpy_float64: np.float64) -> AsIs:
@@ -40,7 +41,7 @@ def create_connection(database_name: str) -> Tuple[connection, cursor]:
         f"host={os.getenv('POSTGRES_HOST')} port={os.getenv('POSTGRES_PORT')} dbname={database_name} user={os.getenv('POSTGRES_USERNAME')} password={os.getenv('POSTGRES_PASSWORD')}"
     )
     conn.set_session(autocommit=True)
-    cur = conn.cursor()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
     return conn, cur
 
 
