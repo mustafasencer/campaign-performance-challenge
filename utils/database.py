@@ -70,7 +70,7 @@ def create_database(database_name: str) -> Tuple[connection, cursor]:
     return create_connection(os.getenv("POSTGRES_DB", default="postgres"))
 
 
-def execute(cur: cursor, query: str, vars: Optional[List[Any]] = None) -> Any:
+def execute(cur: cursor, query: str, vars: Optional[List[Any]] = None) -> None:
     """
 
     :param cur:
@@ -79,12 +79,12 @@ def execute(cur: cursor, query: str, vars: Optional[List[Any]] = None) -> Any:
     :return:
     """
     if vars is None:
-        return cur.execute(query)
+        cur.execute(query)
     else:
-        return cur.execute(query, vars)
+        cur.execute(query, vars)
 
 
-def execute_many(cur: cursor, query: str, vars_list: List[List[Any]]) -> Any:
+def execute_many(cur: cursor, query: str, vars_list: List[List[Any]]) -> None:
     """
 
     :param cur:

@@ -15,6 +15,10 @@ fact_table_table_create = """CREATE TABLE IF NOT EXISTS fact_table(
 	click_through_rate FLOAT
 )"""
 
+fact_table_unique_index = """
+CREATE UNIQUE INDEX idx_fact_table_date_hour_customer_id ON fact_table (date_hour, customer_id)
+"""
+
 user_table_create = """CREATE TABLE IF NOT EXISTS  users(
 	user_id  INT CONSTRAINT users_pk PRIMARY KEY,
 	email  VARCHAR,
@@ -54,6 +58,10 @@ event_table_insert = """INSERT INTO events (event_id, customer_id, user_id, fire
 """
 
 # SELECT events---------------------------------------------------------------------------------------------------------
+fact_table_table_select = """SELECT * FROM fact_table
+                                WHERE date_hour = %s
+                                AND customer_id = %s
+"""
 
 # QUERY LISTS-----------------------------------------------------------------------------------------------------------
 create_table_queries = [

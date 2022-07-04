@@ -13,13 +13,14 @@ from .migrate_db import (
     customer_table_insert,
     event_table_insert,
     fact_table_table_insert,
+    fact_table_table_select,
     user_table_insert,
 )
 
 
 def read_line(file_name: str) -> Iterator[Dict[str, Any]]:
-    with open(file_name) as fh:
-        while line := fh.readline():
+    with open(file_name) as file:
+        for line in file:
             yield json.loads(line)
 
 
@@ -47,38 +48,60 @@ def process_file(cur: cursor, progress: "ProgressBar[int]") -> None:
             typer.echo("File does not contain all required columns!")
             continue
 
-        date_hour = datetime.strptime(row["fired_at"], "%d/%m/%Y, %H:%M:%S")
-        date_hour = date_hour.replace(minute=0, second=0, microsecond=0)
-
+        row["fired_at"] = datetime.strptime(row["fired_at"], "%d/%m/%Y, %H:%M:%S")
         execute(
             cur,
             user_table_insert,
-            [value for key, value in row.items() if key in ("user_id", "email", "ip")],
+            [row["user_id"], row["email"], row["ip"]],
         )
 
         execute(
             cur,
             customer_table_insert,
-            [value for key, value in row.items() if key == "customer_id"],
+            [row["customer_id"]],
         )
 
         execute(
             cur,
             event_table_insert,
             [
-                value
-                for key, value in row.items()
-                if key
-                in ("event_id", "customer_id", "user_id", "fired_at", "event_type")
+                row["event_id"],
+                row["customer_id"],
+                row["user_id"],
+                row["fired_at"],
+                row["event_type"],
             ],
         )
 
-        row["page_loads"] = None
-        row["clicks"] = None
-        row["unique_user_clicks"] = None
-        row["click_through_rate"] = None
+        date_hour = row["fired_at"].replace(minute=0, second=0, microsecond=0)
 
-        execute(cur, fact_table_table_insert)
+        execute(cur, fact_table_table_select, [date_hour, row["customer_id"]])
+
+        fact_table_row = cur.fetchone()
+        if fact_table_row is None:
+            fact_table_row = {
+                "date_hour": date_hour,
+                "customer_id": row["customer_id"],
+                "page_loads": 1 if row["event_type"] == "ReferralPageLoad" else 0,
+                "clicks": 1 if row["event_type"] == "ReferralRecommendClick" else 0,
+                "unique_user_clicks": None,
+                "click_through_rate": None,
+            }
+        else:
+            fact_table_row["page_loads"] = (
+                fact_table_row["page_loads"] + 1
+                if row["event_type"] == "ReferralPageLoad"
+                else fact_table_row["page_loads"]
+            )
+            fact_table_row["clicks"] = (
+                fact_table_row["clicks"] + 1
+                if row["event_type"] == "ReferralRecommendClick"
+                else 0
+            )
+            fact_table_row["unique_user_clicks"] = None
+            fact_table_row["click_through_rate"] = None
+
+        execute(cur, fact_table_table_insert, list(fact_table_row.values()))
 
         print(row)
         print(row)
