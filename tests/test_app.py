@@ -1,3 +1,5 @@
+from typing import Any
+
 from typer.testing import CliRunner
 
 from main import app
@@ -32,7 +34,7 @@ def test_app_with_unsupported_scenario_option() -> None:
     )
 
 
-def test_app_with_undefined_environment_variables(monkeypatch) -> None:
+def test_app_with_undefined_environment_variables(monkeypatch: Any) -> None:
     monkeypatch.delenv("POSTGRES_HOST", raising=True)
     result = runner.invoke(app, ["run", "--scenario", "1st"])
     assert result.exit_code == 1

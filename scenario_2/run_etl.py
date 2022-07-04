@@ -45,7 +45,7 @@ class EventType(str, Enum):
 
 def get_unique_user_clicks(
     cur: cursor, date_hour: datetime, row: Dict[str, Any]
-) -> int:
+) -> Any:
     if row["event_type"] == EventType.CLICK.value:
         execute(
             cur,

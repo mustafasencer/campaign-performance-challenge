@@ -1,8 +1,10 @@
+from typing import Any
+
 import pytest
 
 
 @pytest.fixture(autouse=True)
-def mock_env_user(monkeypatch):
+def mock_env_user(monkeypatch: Any) -> None:
     monkeypatch.setenv("POSTGRES_HOST", "localhost")
     monkeypatch.setenv("POSTGRES_PORT", "5432")
     monkeypatch.setenv("POSTGRES_DB", "sample")
