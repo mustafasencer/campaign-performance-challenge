@@ -7,12 +7,12 @@ import typer
 from click._termui_impl import ProgressBar
 from psycopg2._psycopg import cursor
 
-from scenario_1 import run_etl as run_etl_1
-from scenario_1.migrate_db import create_table_queries as create_1
-from scenario_1.migrate_db import drop_table_queries as drop_1
-from scenario_2 import run_etl as run_etl_2
-from scenario_2.migrate_db import create_table_queries as create_2
-from scenario_2.migrate_db import drop_table_queries as drop_2
+from scenario_1st import run_etl as run_etl_1
+from scenario_1st.migrate_db import create_table_queries as create_1
+from scenario_1st.migrate_db import drop_table_queries as drop_1
+from scenario_2nd import run_etl as run_etl_2
+from scenario_2nd.migrate_db import create_table_queries as create_2
+from scenario_2nd.migrate_db import drop_table_queries as drop_2
 from utils.database import (
     create_connection,
     create_database,
