@@ -4,6 +4,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, Final, Iterator, Tuple
 
+import dateutil.parser as parser
 import typer
 from click._termui_impl import ProgressBar
 from psycopg2._psycopg import cursor
@@ -76,7 +77,7 @@ def process_file(cur: cursor, progress: "ProgressBar[int]") -> None:
             typer.echo("File does not contain all required columns!")
             continue
 
-        row["fired_at"] = datetime.strptime(row["fired_at"], "%d/%m/%Y, %H:%M:%S")
+        row["fired_at"] = parser.parse(row["fired_at"])
         execute(
             cur,
             user_table_insert,
@@ -100,6 +101,11 @@ def process_file(cur: cursor, progress: "ProgressBar[int]") -> None:
                 row["event_type"],
             ],
         )
+
+        event_id = cur.fetchone()
+        if event_id is None:
+            typer.echo(f"Skipping duplicate event!")
+            continue
 
         date_hour = row["fired_at"].replace(minute=0, second=0, microsecond=0)
 
@@ -135,4 +141,4 @@ def process_file(cur: cursor, progress: "ProgressBar[int]") -> None:
                 cur, date_hour, row
             )
 
-        execute(cur, fact_table_table_insert, list(fact_table_row.values()))
+        execute(cur, fact_table_table_insert, fact_table_row)

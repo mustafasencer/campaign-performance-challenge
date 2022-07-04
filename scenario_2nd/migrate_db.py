@@ -55,8 +55,12 @@ event_table_create = """CREATE TABLE  IF NOT EXISTS events(
 
 # INSERT RECORDS--------------------------------------------------------------------------------------------------------
 fact_table_table_insert = """INSERT INTO fact_table (date_hour, customer_id, page_loads, clicks, unique_user_clicks, click_through_rate)
-                                VALUES (%s, %s, %s, %s, %s, %s)
-                                ON CONFLICT (date_hour, customer_id) DO NOTHING
+                                VALUES (%(date_hour)s, %(customer_id)s, %(page_loads)s, %(clicks)s, %(unique_user_clicks)s, %(click_through_rate)s)
+                                ON CONFLICT (date_hour, customer_id) DO UPDATE
+                                SET page_loads = %(page_loads)s,
+                                clicks = %(clicks)s,
+                                unique_user_clicks = %(unique_user_clicks)s,
+                                click_through_rate = %(click_through_rate)s
 """
 
 unique_user_table_insert = """INSERT INTO unique_user (date_hour, customer_id, user_id)
@@ -71,11 +75,12 @@ user_table_insert = """INSERT INTO users (user_id, email, ip) VALUES (%s, %s, %s
 
 # Updating the user level on conflict
 customer_table_insert = """INSERT INTO customers (customer_id) VALUES (%s)
-                        ON CONFLICT (customer_id) DO NOTHING
+                            ON CONFLICT (customer_id) DO NOTHING
 """
 
 event_table_insert = """INSERT INTO events (event_id, customer_id, user_id, fired_at, event_type) VALUES (%s, %s, %s, %s, %s)
                         ON CONFLICT (event_id) DO NOTHING
+                        RETURNING event_id;
 """
 
 # SELECT events---------------------------------------------------------------------------------------------------------

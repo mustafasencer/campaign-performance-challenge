@@ -65,10 +65,10 @@ def process_file(cur: cursor, progress: "ProgressBar[int]") -> None:
     # load events table
     event_df = df[["event_id", "customer_id", "user_id", "fired_at", "event_type"]]
     execute_many(cur, event_table_insert, event_df.values.tolist())
-    progress.update(30)
+    progress.update(40)
 
     # create a column storing fired_at at only a hourly precision
-    df["date_hour"] = df["fired_at"].dt.ceil(freq="h")
+    df["date_hour"] = df["fired_at"].dt.floor(freq="h")
 
     # Create the hourly sliding time horizon for fact_table based on the min and max values of date_hour
     time_idx = pd.date_range(df["date_hour"].min(), df["date_hour"].max(), freq="60min")
@@ -93,9 +93,10 @@ def process_file(cur: cursor, progress: "ProgressBar[int]") -> None:
         .nunique()
     )
     fact_df = fact_df.fillna(0).astype(int)
-    fact_df["click_through_rate"] = fact_df["clicks"] / fact_df["page_loads"]
+    fact_df["click_through_rate"] = 0  # fact_df["clicks"] / fact_df["page_loads"]
     fact_df.reset_index(inplace=True)
+    progress.update(10)
 
     # load fact_table table
     execute_many(cur, fact_table_table_insert, fact_df.values.tolist())
-    progress.update(20)
+    progress.update(10)

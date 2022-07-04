@@ -1,34 +1,9 @@
 import os
 from typing import Any, List, Optional, Tuple
 
-import numpy
-import numpy as np
 import psycopg2
 from psycopg2._psycopg import connection, cursor
-from psycopg2.extensions import AsIs, register_adapter
 from psycopg2.extras import RealDictCursor
-
-
-def adapt_numpy_float64(numpy_float64: np.float64) -> AsIs:
-    """
-
-    :param numpy_float64:
-    :return:
-    """
-    return AsIs(numpy_float64)
-
-
-def adapt_numpy_int64(numpy_int64: np.float64) -> AsIs:
-    """
-
-    :param numpy_int64:
-    :return:
-    """
-    return AsIs(numpy_int64)
-
-
-register_adapter(numpy.float64, adapt_numpy_float64)
-register_adapter(numpy.int64, adapt_numpy_int64)
 
 
 def create_connection(database_name: str) -> Tuple[connection, cursor]:
@@ -101,7 +76,6 @@ def drop_tables(cur: cursor, table_list: List[str]) -> None:
     Run's all the drop table queries defined in migrate_db.py
     :param table_list:
     :param cur: cursor to the database
-    :param conn: database connection reference
     """
     for query in table_list:
         cur.execute(query)
@@ -112,7 +86,6 @@ def create_tables(cur: cursor, table_list: List[str]) -> None:
     Run's all the create table queries defined in migrate_db.py
     :param table_list:
     :param cur: cursor to the database
-    :param conn: database connection reference
     """
     for query in table_list:
         cur.execute(query)
