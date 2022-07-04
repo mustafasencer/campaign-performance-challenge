@@ -1,4 +1,5 @@
 import os
+from enum import Enum
 from typing import Final, Tuple
 
 import pandas as pd
@@ -24,6 +25,11 @@ EVENT_COLUMNS: Final[Tuple[str, ...]] = (
     "ip",
     "email",
 )
+
+
+class EventType(str, Enum):
+    CLICK = "ReferralRecommendClick"
+    PAGE_LOAD = "ReferralPageLoad"
 
 
 def process_file(cur: cursor, progress: "ProgressBar[int]") -> None:
@@ -76,13 +82,13 @@ def process_file(cur: cursor, progress: "ProgressBar[int]") -> None:
 
     group = ["date_hour", "customer_id"]
     fact_df["page_loads"] = (
-        df[df["event_type"] == "ReferralPageLoad"].groupby(group).size()
+        df[df["event_type"] == EventType.PAGE_LOAD.value].groupby(group).size()
     )
     fact_df["clicks"] = (
-        df[df["event_type"] == "ReferralRecommendClick"].groupby(group).size()
+        df[df["event_type"] == EventType.CLICK.value].groupby(group).size()
     )
     fact_df["unique_user_clicks"] = (
-        df[df["event_type"] == "ReferralRecommendClick"]
+        df[df["event_type"] == EventType.CLICK.value]
         .groupby(group)["user_id"]
         .nunique()
     )
