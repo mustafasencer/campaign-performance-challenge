@@ -1,7 +1,6 @@
 # Campaign Performance Analysis
 
 [![codecov](https://codecov.io/gh/mustafasencer/aklamio-challenge/branch/main/graph/badge.svg?token=laF1P8JGJR)](https://codecov.io/gh/mustafasencer/aklamio-challenge)
-
 [![Test](https://github.com/mustafasencer/aklamio-challenge/actions/workflows/test.yml/badge.svg)](https://github.com/mustafasencer/aklamio-challenge/actions/workflows/test.yml)
 
 ### 📦 Dependencies
