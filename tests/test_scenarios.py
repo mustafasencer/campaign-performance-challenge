@@ -11,31 +11,78 @@ runner = CliRunner()
 DATA_CHECK = [
     {
         "query_params": ["2022-01-01 00:00:00", "32"],
-        "page_loads": 38,
-        "clicks": 3,
-        "unique_user_clicks": 3,
-        "click_through_rate": 0,
+        "1st": {
+            "page_loads": 38,
+            "clicks": 3,
+            "unique_user_clicks": 3,
+            "click_through_rate": 0,
+        },
+        "2nd": {
+            "page_loads": 50,
+            "clicks": 3,
+            "unique_user_clicks": 3,
+            "click_through_rate": 0,
+        },
     },
     {
         "query_params": ["2022-01-01 00:00:00", "344"],
-        "page_loads": 47,
-        "clicks": 7,
-        "unique_user_clicks": 7,
-        "click_through_rate": 0,
+        "1st": {
+            "page_loads": 47,
+            "clicks": 7,
+            "unique_user_clicks": 7,
+            "click_through_rate": 2,
+        },
+        "2nd": {
+            "page_loads": 64,
+            "clicks": 7,
+            "unique_user_clicks": 7,
+            "click_through_rate": 2,
+        },
     },
     {
         "query_params": ["2022-01-01 01:00:00", "29"],
-        "page_loads": 41,
-        "clicks": 7,
-        "unique_user_clicks": 7,
-        "click_through_rate": 0,
+        "1st": {
+            "page_loads": 39,
+            "clicks": 7,
+            "unique_user_clicks": 7,
+            "click_through_rate": 3,
+        },
+        "2nd": {
+            "page_loads": 52,
+            "clicks": 7,
+            "unique_user_clicks": 7,
+            "click_through_rate": 4,
+        },
     },
     {
         "query_params": ["2022-01-01 01:00:00", "126"],
-        "page_loads": 35,
-        "clicks": 4,
-        "unique_user_clicks": 4,
-        "click_through_rate": 0,
+        "1st": {
+            "page_loads": 32,
+            "clicks": 4,
+            "unique_user_clicks": 4,
+            "click_through_rate": 0,
+        },
+        "2nd": {
+            "page_loads": 43,
+            "clicks": 4,
+            "unique_user_clicks": 4,
+            "click_through_rate": 0,
+        },
+    },
+    {
+        "query_params": ["2022-01-01 02:00:00", "54"],
+        "1st": {
+            "page_loads": 38,
+            "clicks": 5,
+            "unique_user_clicks": 5,
+            "click_through_rate": 1,
+        },
+        "2nd": {
+            "page_loads": 54,
+            "clicks": 5,
+            "unique_user_clicks": 5,
+            "click_through_rate": 1,
+        },
     },
 ]
 
@@ -61,7 +108,7 @@ def test_2nd_scenario():
 
 
 def test_data_integrity():
-    scenarios = ["1st"]
+    scenarios = ["1st", "2nd"]
 
     for scenario in scenarios:
         runner.invoke(app, ["migrate", "--scenario", scenario])
@@ -70,7 +117,14 @@ def test_data_integrity():
         for data in DATA_CHECK:
             execute(cur, fact_table_table_select, data["query_params"])
             result = cur.fetchone()
-            assert result["page_loads"] == data["page_loads"]
-            assert result["clicks"] == data["clicks"]
-            assert result["unique_user_clicks"] == data["unique_user_clicks"]
-            assert result["click_through_rate"] == data["click_through_rate"]
+            values_to_be_validated = data[scenario]
+            assert result["page_loads"] == values_to_be_validated["page_loads"]
+            assert result["clicks"] == values_to_be_validated["clicks"]
+            assert (
+                result["unique_user_clicks"]
+                == values_to_be_validated["unique_user_clicks"]
+            )
+            assert (
+                result["click_through_rate"]
+                == values_to_be_validated["click_through_rate"]
+            )
