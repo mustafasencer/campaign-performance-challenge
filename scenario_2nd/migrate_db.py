@@ -10,10 +10,10 @@ fact_table_table_create = """CREATE TABLE IF NOT EXISTS fact_table(
 	fact_table_id SERIAL CONSTRAINT fact_table_pk PRIMARY KEY,
 	date_hour timestamp NOT NULL,
 	customer_id INT REFERENCES customers (customer_id),
-	page_loads INT,
-	clicks INT,
-	unique_user_clicks INT,
-	click_through_rate FLOAT
+	page_loads INT DEFAULT 0,
+	clicks INT DEFAULT 0,
+	unique_user_clicks INT DEFAULT 0,
+	click_through_rate INT DEFAULT 0
 )"""
 
 fact_table_unique_index = """
@@ -49,16 +49,23 @@ event_table_create = """CREATE TABLE  IF NOT EXISTS events(
 	event_id VARCHAR CONSTRAINT events_pk PRIMARY KEY,
 	customer_id INT REFERENCES customers (customer_id),
 	fired_at TIMESTAMP,
+	prev_fired_at TIMESTAMP,
 	user_id INT REFERENCES users (user_id),
-	event_type VARCHAR
+	event_type VARCHAR,
+	prev_event_type VARCHAR
 )"""
 
 # INSERT RECORDS--------------------------------------------------------------------------------------------------------
-fact_table_table_insert = """INSERT INTO fact_table (date_hour, customer_id, page_loads, clicks, unique_user_clicks, click_through_rate)
-                                VALUES (%(date_hour)s, %(customer_id)s, %(page_loads)s, %(clicks)s, %(unique_user_clicks)s, %(click_through_rate)s)
+fact_table_table_page_loads_upsert = """INSERT INTO fact_table (date_hour, customer_id, page_loads)
+                                VALUES (%(date_hour)s, %(customer_id)s, %(page_loads)s)
                                 ON CONFLICT (date_hour, customer_id) DO UPDATE
-                                SET page_loads = %(page_loads)s,
-                                clicks = %(clicks)s,
+                                SET page_loads = %(page_loads)s
+"""
+
+fact_table_table_clicks_upsert = """INSERT INTO fact_table (date_hour, customer_id, clicks, unique_user_clicks, click_through_rate)
+                                VALUES (%(date_hour)s, %(customer_id)s, %(clicks)s, %(unique_user_clicks)s, %(click_through_rate)s)
+                                ON CONFLICT (date_hour, customer_id) DO UPDATE
+                                SET clicks = %(clicks)s,
                                 unique_user_clicks = %(unique_user_clicks)s,
                                 click_through_rate = %(click_through_rate)s
 """
@@ -78,9 +85,18 @@ customer_table_insert = """INSERT INTO customers (customer_id) VALUES (%s)
                             ON CONFLICT (customer_id) DO NOTHING
 """
 
-event_table_insert = """INSERT INTO events (event_id, customer_id, user_id, fired_at, event_type) VALUES (%s, %s, %s, %s, %s)
-                        ON CONFLICT (event_id) DO NOTHING
-                        RETURNING event_id;
+event_table_upsert = """INSERT INTO events (event_id, customer_id, user_id, fired_at, event_type) VALUES (%s, %s, %s, %s, %s)
+                        ON CONFLICT (event_id) DO UPDATE SET
+                        event_type = EXCLUDED.event_type,
+                        fired_at = EXCLUDED.fired_at,
+                        prev_event_type = events.event_type,
+                        prev_fired_at = events.fired_at
+                        RETURNING
+                            event_id,
+                            fired_at,
+                            event_type,
+                            prev_fired_at,
+                            prev_event_type
 """
 
 # SELECT events---------------------------------------------------------------------------------------------------------
@@ -92,6 +108,13 @@ fact_table_table_select = """SELECT date_hour, customer_id, page_loads, clicks, 
 unique_user_table_select = """SELECT count(user_id) as count FROM unique_user
                                 WHERE date_hour = %s
                                 AND customer_id = %s
+"""
+
+event_table_select = """SELECT event_id FROM events
+                                WHERE customer_id = %s
+                                AND user_id = %s
+                                AND event_type = %s
+                                AND fired_at >= %s
 """
 
 # QUERY LISTS-----------------------------------------------------------------------------------------------------------

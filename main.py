@@ -7,12 +7,12 @@ import typer
 from click._termui_impl import ProgressBar
 from psycopg2._psycopg import cursor
 
-from scenario_1st import run_etl as run_etl_1
-from scenario_1st.migrate_db import create_table_queries as create_1
-from scenario_1st.migrate_db import drop_table_queries as drop_1
-from scenario_2nd import run_etl as run_etl_2
-from scenario_2nd.migrate_db import create_table_queries as create_2
-from scenario_2nd.migrate_db import drop_table_queries as drop_2
+from scenario_1st import run_etl as run_etl_1st
+from scenario_1st.migrate_db import create_table_queries as create_1st
+from scenario_1st.migrate_db import drop_table_queries as drop_1st
+from scenario_2nd import run_etl as run_etl_2nd
+from scenario_2nd.migrate_db import create_table_queries as create_2nd
+from scenario_2nd.migrate_db import drop_table_queries as drop_2nd
 from utils.database import (
     create_connection,
     create_database,
@@ -36,8 +36,8 @@ class Scenario(str, Enum):
 
 
 SCENARIOS_MAPPER: Final[Dict[Scenario, _Scenario]] = {
-    Scenario.FIRST: _Scenario(run_etl_1.process_file, create_1, drop_1),
-    Scenario.SECOND: _Scenario(run_etl_2.process_file, create_2, drop_2),
+    Scenario.FIRST: _Scenario(run_etl_1st.process_file, create_1st, drop_1st),
+    Scenario.SECOND: _Scenario(run_etl_2nd.process_file, create_2nd, drop_2nd),
 }
 
 
@@ -96,5 +96,5 @@ def migrate(scenario: Scenario = Scenario.FIRST) -> None:
     typer.echo("Migration terminated successfully!")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     app()

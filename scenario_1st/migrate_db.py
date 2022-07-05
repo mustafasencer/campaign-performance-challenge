@@ -14,7 +14,7 @@ fact_table_table_create = """CREATE TABLE IF NOT EXISTS fact_table(
 	page_loads INT,
 	clicks INT,
 	unique_user_clicks INT,
-	click_through_rate FLOAT
+	click_through_rate INT
 )"""
 
 fact_table_unique_index = """

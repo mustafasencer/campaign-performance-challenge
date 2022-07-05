@@ -1,5 +1,5 @@
 import os
-from typing import Any, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import psycopg2
 from psycopg2._psycopg import connection, cursor
@@ -30,14 +30,15 @@ def create_database(database_name: str) -> Tuple[connection, cursor]:
     conn, cur = create_connection("postgres")
 
     try:
-        cur.execute(
+        execute(
+            cur,
             f"""SELECT pg_terminate_backend(pg_stat_activity.pid)
                         FROM pg_stat_activity
-                        WHERE pg_stat_activity.datname = '{database_name}' AND pid <> pg_backend_pid();"""
+                        WHERE pg_stat_activity.datname = '{database_name}' AND pid <> pg_backend_pid();""",
         )
-        cur.execute("DROP DATABASE IF EXISTS sample")
+        execute(cur, "DROP DATABASE IF EXISTS sample")
         # create sample database with UTF8 encoding
-        cur.execute("CREATE DATABASE sample WITH ENCODING 'utf8' TEMPLATE template0")
+        execute(cur, "CREATE DATABASE sample WITH ENCODING 'utf8' TEMPLATE template0")
     finally:
         # close connection to default database
         conn.close()
@@ -46,7 +47,9 @@ def create_database(database_name: str) -> Tuple[connection, cursor]:
     return create_connection(os.getenv("POSTGRES_DB", default="postgres"))
 
 
-def execute(cur: cursor, query: str, vars: Optional[List[Any]] = None) -> None:
+def execute(
+    cur: cursor, query: str, vars: Optional[Union[List[Any], Dict[str, Any]]] = None
+) -> None:
     """
 
     :param cur:

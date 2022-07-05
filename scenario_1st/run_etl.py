@@ -1,6 +1,6 @@
 import os
 from enum import Enum
-from typing import Final, Tuple
+from typing import Final, List, Tuple
 
 import pandas as pd
 import typer
@@ -26,18 +26,56 @@ EVENT_COLUMNS: Final[Tuple[str, ...]] = (
     "email",
 )
 
+CLICK_THROUGH_RATE_TIME_WINDOW: Final[int] = 30
+
 
 class EventType(str, Enum):
     CLICK = "ReferralRecommendClick"
     PAGE_LOAD = "ReferralPageLoad"
 
 
+def get_page_loads(df: pd.DataFrame, group: List[str]) -> pd.Series:
+    return df[df["event_type"] == EventType.PAGE_LOAD.value].groupby(group).size()
+
+
+def get_clicks(df: pd.DataFrame, group: List[str]) -> pd.Series:
+    return df[df["event_type"] == EventType.CLICK.value].groupby(group).size()
+
+
+def get_unique_user_clicks(df: pd.DataFrame, group: List[str]) -> pd.Series:
+    return (
+        df[df["event_type"] == EventType.CLICK.value]
+        .groupby(group)["user_id"]
+        .nunique()
+    )
+
+
+def get_click_through_rate(df: pd.DataFrame, group: List[str]) -> pd.Series:
+    df["fired_at_1_diff"] = (
+        df.groupby(["customer_id", "user_id"])["fired_at"]
+        .diff()
+        .fillna(pd.Timedelta(seconds=0))
+        .dt.seconds
+        / 60
+    ).astype(int)
+    df["event_type_1_shifted"] = df.groupby(["customer_id", "user_id"])[
+        "event_type"
+    ].shift()
+    condition = (
+        (df["event_type"] == EventType.CLICK.value)
+        & (df["fired_at_1_diff"] < CLICK_THROUGH_RATE_TIME_WINDOW)
+        & (df["event_type_1_shifted"] == EventType.PAGE_LOAD.value)
+    )
+    return df[condition].groupby(group).size().fillna(0).astype(int)
+
+
 def process_file(cur: cursor, progress: "ProgressBar[int]") -> None:
     """
-
+    Process the input json file (defined path is retrieved from the env variable `FILE_PATH`) for 1st scenario,
+     loads the entire file and process accordingly.
     :param cur:
     :param progress:
-    :return:
+    :return: None
     """
     # read json data
     df = pd.read_json(os.getenv("FILE_PATH"), lines=True)
@@ -81,19 +119,13 @@ def process_file(cur: cursor, progress: "ProgressBar[int]") -> None:
     )
 
     group = ["date_hour", "customer_id"]
-    fact_df["page_loads"] = (
-        df[df["event_type"] == EventType.PAGE_LOAD.value].groupby(group).size()
-    )
-    fact_df["clicks"] = (
-        df[df["event_type"] == EventType.CLICK.value].groupby(group).size()
-    )
-    fact_df["unique_user_clicks"] = (
-        df[df["event_type"] == EventType.CLICK.value]
-        .groupby(group)["user_id"]
-        .nunique()
-    )
+
+    fact_df["page_loads"] = get_page_loads(df, group)
+    fact_df["clicks"] = get_clicks(df, group)
+    fact_df["unique_user_clicks"] = get_unique_user_clicks(df, group)
+    fact_df["click_through_rate"] = get_click_through_rate(df, group)
+
     fact_df = fact_df.fillna(0).astype(int)
-    fact_df["click_through_rate"] = 0  # fact_df["clicks"] / fact_df["page_loads"]
     fact_df.reset_index(inplace=True)
     progress.update(10)
 
