@@ -1,12 +1,8 @@
 # Campaign Performance Analysis
 
-<a href="https://codecov.io/gh/mustafasencer/aklamio-challenge" target="_blank">
-    <img src="https://img.shields.io/codecov/c/github/mustafasencer/aklamio-challenge?color=%2334D058" alt="Coverage">
-</a>
+[![codecov](https://codecov.io/gh/mustafasencer/aklamio-challenge/branch/main/graph/badge.svg?token=laF1P8JGJR)](https://codecov.io/gh/mustafasencer/aklamio-challenge)
 
-<a href="https://github.com/mustafasencer/aklamio-challenge/actions?query=workflow%3ATest" target="_blank">
-    <img src="https://github.com/mustafasencer/aklamio-challenge/workflows/Test/badge.svg" alt="Test">
-</a>
+[![Test](https://github.com/mustafasencer/aklamio-challenge/actions/workflows/test.yml/badge.svg)](https://github.com/mustafasencer/aklamio-challenge/actions/workflows/test.yml)
 
 ### 📦 Dependencies
 
@@ -55,7 +51,7 @@ make test-with-coverage
 ###### Assumptions:
 
 * Data deduplication decision has been taken based on the data analysis done
-  in [a link](https://github.com/user/repo/blob/branch/generate_report.py).
+  in [here](https://github.com/mustafasencer/aklamio-challenge/blob/main/data/generate_report.py).
 * The decision of keeping the last duplicate event has been taken.
 * `click_through_rate` has been calculated based on a **30 min** time window check where
   the presence of a `ReferralPageLoad` event is checked before firing of the `ReferralRecommendClick` event.
