@@ -140,18 +140,22 @@ def process_file(cur: cursor, _: "ProgressBar[int]") -> None:
             continue
 
         line_row["fired_at"] = parser.parse(line_row["fired_at"])
+
+        # load users table
         execute(
             cur,
             user_table_insert,
             [line_row["user_id"], line_row["email"], line_row["ip"]],
         )
 
+        # load customers table
         execute(
             cur,
             customer_table_insert,
             [line_row["customer_id"]],
         )
 
+        # load events table
         execute(
             cur,
             event_table_upsert,
@@ -166,10 +170,12 @@ def process_file(cur: cursor, _: "ProgressBar[int]") -> None:
 
         date_hour = line_row["fired_at"].replace(minute=0, second=0, microsecond=0)
 
+        # select fact table row
         execute(cur, fact_table_table_select, [date_hour, line_row["customer_id"]])
 
         fact_table_row = cur.fetchone()
 
+        # page load aggregation is handled here
         if line_row["event_type"] == EventType.PAGE_LOAD.value:
             page_loads = get_page_loads(fact_table_row)
             execute(
@@ -182,6 +188,7 @@ def process_file(cur: cursor, _: "ProgressBar[int]") -> None:
                 },
             )
 
+        # click related aggregations are handled here
         elif line_row["event_type"] == EventType.CLICK.value:
             clicks = get_clicks(fact_table_row)
             unique_user_clicks = get_unique_user_clicks(cur, date_hour, line_row)

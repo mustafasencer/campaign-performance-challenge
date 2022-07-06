@@ -35,14 +35,32 @@ class EventType(str, Enum):
 
 
 def get_page_loads(df: pd.DataFrame, group: List[str]) -> pd.Series:
+    """
+
+    :param df:
+    :param group:
+    :return:
+    """
     return df[df["event_type"] == EventType.PAGE_LOAD.value].groupby(group).size()
 
 
 def get_clicks(df: pd.DataFrame, group: List[str]) -> pd.Series:
+    """
+
+    :param df:
+    :param group:
+    :return:
+    """
     return df[df["event_type"] == EventType.CLICK.value].groupby(group).size()
 
 
 def get_unique_user_clicks(df: pd.DataFrame, group: List[str]) -> pd.Series:
+    """
+
+    :param df:
+    :param group:
+    :return:
+    """
     return (
         df[df["event_type"] == EventType.CLICK.value]
         .groupby(group)["user_id"]
@@ -51,6 +69,12 @@ def get_unique_user_clicks(df: pd.DataFrame, group: List[str]) -> pd.Series:
 
 
 def get_click_through_rate(df: pd.DataFrame, group: List[str]) -> pd.Series:
+    """
+
+    :param df:
+    :param group:
+    :return:
+    """
     df["fired_at_1_diff"] = (
         df.groupby(["customer_id", "user_id"])["fired_at"]
         .diff()
